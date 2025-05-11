@@ -45,7 +45,7 @@ class Graph:
                     if not self.directed:
                         seen.add((src, dest))
         return edges
-        
+
     @staticmethod
     def create_random_graph(num_nodes, num_edges, directed=False):
         if num_nodes > 26:
@@ -62,7 +62,7 @@ class Graph:
         while len(edge_set) < num_edges:
             src, dest = random.sample(nodes, 2)
             if directed:
-                edge = (src, dest)
+                edge = (src, dest,random.randint(10,1001))
             else:
                 edge = tuple(sorted((src, dest)))
 

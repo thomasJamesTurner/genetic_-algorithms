@@ -5,9 +5,13 @@ from genetic_alogrithms.permutation_genetic_algo import Individual
 global tsp_graph
 def fitness_func(current_individual):
     total_weight = 0
-    for i in range(len(current_individual.chromosome) - 1):
-        src = current_individual.chromosome[i]
-        dest = current_individual.chromosome[i + 1]
+    for i in range(len(current_individual.chromosome)):
+        if(i == len(current_individual.chromosome)-1):
+            src = current_individual.chromosome[i]
+            dest = current_individual.chromosome[0]
+        else:
+            src = current_individual.chromosome[i]
+            dest = current_individual.chromosome[i + 1]
         # Find the edge in the adjacency list
         for neighbor, weight in tsp_graph.adj_list.get(src, []):
             if neighbor == dest:
@@ -15,7 +19,7 @@ def fitness_func(current_individual):
                 break
         else:
             # Edge doesn't exist
-            weight += 1000000
+            total_weight += 10000000
     return total_weight
 
 def get_pop_fitness_cutoff(population,average_fitness):
@@ -25,35 +29,39 @@ def get_pop_fitness_cutoff(population,average_fitness):
 
 def main():
     global tsp_graph
-    tsp_graph = Graph.create_random_graph(6,12)
+    tsp_graph = Graph.create_random_graph(26,200)
     generation = 1
     found = False
     population = []
     Individual.gene_pool = tsp_graph.get_nodes()
-    Individual.set_chromosome_length_limits(6,12)
-
-
-
+    print(tsp_graph)
     for _ in range(100):
         population.append(Individual(fitness_func=fitness_func))
 
     while(not found):
-        population = sorted(population, key = lambda x:x.fitness,reverse=True) 
-        if generation > 2000:
+        population = sorted(population, key = lambda x:x.fitness) 
+        if generation >= 10000:
             break
 
         average_fitness = sum([i.fitness for i in population]) / len(population)
         new_generation = []
         cut_off = get_pop_fitness_cutoff(population,average_fitness)
         new_generation.extend(population[:cut_off])
+        if(population[0].fitness/average_fitness <2 ):
+            Individual.mutation_chance *= 2
+        else:
+            Individual.mutation_chance /= 1.5
+        if(cut_off == 0):
+            cut_off = int(len(population)*0.1)
 
-        for _ in range(len(population) - len(new_generation)):
-            if(cut_off == 0):
-                cut_off = int(len(population)*0.1)
+        for _ in range(int((len(population) - len(new_generation)))):
+            
             parent1 = random.choice(population[:cut_off]) 
             parent2 = random.choice(population[:cut_off]) 
             child = Individual.mate(parent1,parent2) 
             new_generation.append(child) 
+        
+        
         population = new_generation 
 
         print("Generation: {}\tString: {}\tFitness: {} Average Fitness: {}". 

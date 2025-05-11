@@ -2,11 +2,13 @@ import random
 
 class Individual:
 
-    mutation_chance = 0.05
+    mutation_chance = 0.1
     gene_pool = []
     fitness_func = None
-    def __init__(self,fitness_func, chromosome = None):
+    def __init__(self,fitness_func, chromosome = None,genes = None):
         Individual.fitness_func = fitness_func
+        if(genes != None):
+            Individual.set_gene_pool(genes)
         if(chromosome != None):
             self.chromosome = chromosome
         else:
